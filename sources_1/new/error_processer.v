@@ -26,19 +26,18 @@ input rst_in,
 input rst_out,
 
 output reg gen_stop = 1'd0
-    );
+);
     
-    reg [3:0] error_counter = 3'd0;
-    
+    reg [3:0] error_counter = 'd0;
     always @(posedge gen_rst) begin
-        if(error_counter < 3) begin
+        if(error_counter < 'd3) begin
             error_counter = error_counter + 1'b1;
         end
-        if(error_counter >= 3) begin
+        if(error_counter >= 'd3) begin
             gen_stop <= 1'd1;
         end
         if(rst_in == 1) begin
-            error_counter = 3'd0;
+            error_counter = 'd0;
             gen_stop <= 1'd0;
         end
     end

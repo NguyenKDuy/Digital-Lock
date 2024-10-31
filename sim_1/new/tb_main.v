@@ -78,16 +78,14 @@ module tb_main; // Testbench for main
         
         // Assum rst_out enable
         #10 rst_out = 1; 
-        #10 rst_out = 0; 
-        
+        #10 rst_out = 0;      
 //4
-        // Assume incorrect input password
+        // Assume correct input password
         #10 pw_16bit = 16'h0000; 
         repeat (4) begin
             #10 enb_cmp = 1; 
             #10 enb_cmp = 0;
         end
-
 //5
         // Assume incorrect input password
         #10 pw_16bit = 16'h1234; 
@@ -95,7 +93,6 @@ module tb_main; // Testbench for main
             #10 enb_cmp = 1; 
             #10 enb_cmp = 0;
         end
-
 //6
         // Assume incorrect input password
         #10 pw_16bit = 16'h1234; 
@@ -103,17 +100,15 @@ module tb_main; // Testbench for main
             #10 enb_cmp = 1; 
             #10 enb_cmp = 0;
         end
-
 //7
         // Assume incorrect input password
         #10 pw_16bit = 16'h1234; 
         repeat (4) begin
             #10 enb_cmp = 1; 
             #10 enb_cmp = 0;
-        end
-        
+        end      
 //8
-        // Assume incorrect input password
+        // Assume correct input password
         #10 pw_16bit = 16'h0000; 
         repeat (4) begin
             #10 enb_cmp = 1; 
