@@ -25,29 +25,24 @@ input gen_rst,
 input rst_in,
 input rst_out,
 
-output reg gen_stop
+output reg gen_stop = 1'd0
     );
     
-    reg [3:0] error_counter;
+    reg [3:0] error_counter = 3'd0;
     
-    initial begin
-        error_counter = 0;
-        gen_stop = 0;
-    end
     always @(posedge gen_rst) begin
         if(error_counter < 3) begin
-            error_counter = error_counter + 1;
+            error_counter = error_counter + 1'b1;
         end
-        if(error_counter == 3) begin
-            gen_stop = 1;
+        if(error_counter >= 3) begin
+            gen_stop <= 1'd1;
         end
         if(rst_in == 1) begin
-            error_counter = 0;
-            gen_stop = 0;
+            error_counter = 3'd0;
+            gen_stop <= 1'd0;
         end
     end
     always @(posedge rst_out) begin
-        error_counter = 0;
-        gen_stop = 0;
+        gen_stop <= 1'd0;
     end
 endmodule

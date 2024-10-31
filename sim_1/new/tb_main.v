@@ -30,7 +30,7 @@ module tb_main; // Testbench for main
 
     wire enb_lock;
     wire gen_stop;
-
+    
     main uut (
         .pw_16bit(pw_16bit),
         .password(password),
@@ -54,40 +54,71 @@ module tb_main; // Testbench for main
         #10 reset = 1; 
         #10 reset = 0; 
         #20;
-
-        // Assume correct input password
+//1
+        // Assume incorrect input password
+        #10 pw_16bit = 16'h1234; 
+        repeat (4) begin
+            #10 enb_cmp = 1; 
+            #10 enb_cmp = 0;
+        end
+//2
+        // Assume incorrect input password
+        #10 pw_16bit = 16'h1234; 
+        repeat (4) begin
+            #10 enb_cmp = 1; 
+            #10 enb_cmp = 0;
+        end
+//3
+        // Assume incorrect input password
+        #10 pw_16bit = 16'h1234; 
+        repeat (4) begin
+            #10 enb_cmp = 1; 
+            #10 enb_cmp = 0;
+        end
+        
+        // Assum rst_out enable
+        #10 rst_out = 1; 
+        #10 rst_out = 0; 
+        
+//4
+        // Assume incorrect input password
         #10 pw_16bit = 16'h0000; 
         repeat (4) begin
             #10 enb_cmp = 1; 
             #10 enb_cmp = 0;
         end
 
-        #50;
+//5
+        // Assume incorrect input password
+        #10 pw_16bit = 16'h1234; 
+        repeat (4) begin
+            #10 enb_cmp = 1; 
+            #10 enb_cmp = 0;
+        end
+
+//6
+        // Assume incorrect input password
+        #10 pw_16bit = 16'h1234; 
+        repeat (4) begin
+            #10 enb_cmp = 1; 
+            #10 enb_cmp = 0;
+        end
+
+//7
+        // Assume incorrect input password
+        #10 pw_16bit = 16'h1234; 
+        repeat (4) begin
+            #10 enb_cmp = 1; 
+            #10 enb_cmp = 0;
+        end
         
-        // Assume incorrect password
-        #10 pw_16bit = 16'h5678;
+//8
+        // Assume incorrect input password
+        #10 pw_16bit = 16'h0000; 
         repeat (4) begin
             #10 enb_cmp = 1; 
             #10 enb_cmp = 0;
-        end
-        #10 pw_16bit = 16'h1234;
-        repeat (4) begin
-            #10 enb_cmp = 1; 
-            #10 enb_cmp = 0;
-        end
-        #10 pw_16bit = 16'h2468;
-        repeat (4) begin
-            #10 enb_cmp = 1; 
-            #10 enb_cmp = 0;
-        end
-
-        #50;
-
-        // Assum rst_out enable
-        #10 rst_out = 1; 
-        #10 rst_out = 0; 
-        #20;
-
+        end        
         // Reset system
         #10 reset = 1; 
         #10 reset = 0; 
@@ -98,6 +129,6 @@ module tb_main; // Testbench for main
     initial begin
         $monitor("Time: %0d | pw_16bit: %h | password: %h | enb_cmp: %b | reset: %b | rst_out: %b | enb_lock: %b | gen_stop: %b | gen_rst: %b",
                  $time, pw_16bit, password, enb_cmp, reset, rst_out, enb_lock, gen_stop, uut.gen_rst);        
-    end 
+    end
 endmodule
 
