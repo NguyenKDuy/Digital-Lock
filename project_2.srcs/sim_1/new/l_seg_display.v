@@ -122,7 +122,7 @@ output reg [15:0] led7_out
     
     //khi nhận tín hiệu enb_count
     always@(posedge enb_count) begin
-    led7_out <= led_cnt;
+    led7_out <= led_cnt16;
     end
       
 endmodule
