@@ -23,7 +23,7 @@
 module l_seg_display(
 input clk_in, confirm, reset, enb_count,
 input [3:0] value_4bit,
-input [15:0] led_cnt,
+input [15:0] led_cnt16,
 output clk_1hz,
 output reg [2:0] count = 3'd0,
 output reg [15:0] pw_16bit,
