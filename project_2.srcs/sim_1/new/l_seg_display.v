@@ -1,128 +1,90 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 10/31/2024 12:07:24 AM
-// Design Name: 
 // Module Name: l_seg_display
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
 //////////////////////////////////////////////////////////////////////////////////
 
-
 module l_seg_display(
-input clk_in, confirm, reset, enb_count,
-input [3:0] value_4bit,
-input [15:0] led_cnt16,
-output clk_1hz,
-output reg [2:0] count = 3'd0,
-output reg [15:0] pw_16bit,
-output reg [15:0] led7_out
+    input clk_in, confirm, reset, enb_count,
+    input [15:0] led_cnt16,
+    input [3:0] value_4bit,
+    output reg [15:0] led7_out = 16'hFFFF // Initialize with known state
+//    output led, 
+//    output reg [3:0] count = 4'd0
 );
-    
-
+    reg [3:0] count = 4'd0;
+    reg [27:0] blink_counter = 28'd0;
     reg [3:0] reg0 = 4'b1111;
     reg [3:0] reg1 = 4'b1111;
     reg [3:0] reg2 = 4'b1111;
     reg [3:0] reg3 = 4'b1111;
+    reg toggle_display = 1'b0;
 
-   //nháy reg3 ngoài cùng 
-    clk_divider #(.DIV(28'd62500000)) clk_out(clk_in, clk_1hz); //DIV 1
-    reg [2:0] counter_toggle = 2'd0;   
-    always@(posedge clk_1hz)
-    begin
-    if (counter_toggle == 2'd0) 
-    begin
-        led7_out <= {reg0, reg1, reg2, 4'b1111};
-        counter_toggle <= 2'd1;
-    end else begin
-        led7_out <= {reg0, reg1, reg2, reg3};
-        counter_toggle <= 2'd0;
-    end  
-    end
+    // Clock generation for 1 Hz and 100 Hz signals
+    wire clk_1hz, clk_100hz, button;
+    button_push bt(clk_in, confirm, button);
+    clk_divider #(.DIV(28'd1)) clk_out(clk_in, clk_1hz);
+    clk_divider #(.DIV(28'd100)) clk_out2(clk_in, clk_100hz);
+    assign led = button;
 
-    //khi nhận tín hiệu reset
-    always@(posedge reset) begin
-    count <= 3'd5;
-    reg0 <= 4'b1111; 
-            reg1 <= 4'b1111;
-            reg2 <= 4'b1111;
-            reg3 <= 4'b1111; 
-            pw_16bit <= 16'b0; 
-            count <= 3'd0;
-    end 
+    // Register control and blink toggling
+    always @(posedge clk_100hz ) begin
+    //tín hi?u enb_count hi?n th? ??m ng??c
+            if (enb_count) begin
+            led7_out <= led_cnt16;
+            end
+            blink_counter <= blink_counter + 1;
+            if (blink_counter == 28'd50) begin 
+                toggle_display <= ~toggle_display;
+                blink_counter <= 28'd0;
+            end
 
-    //d?ch trái các thanh ghi
-    always@(negedge confirm) begin
-    case(count)
-    3'd0: begin
-        reg3 <= value_4bit;
+            // Toggle display between showing reg3 and hiding it
+            if (toggle_display == 1'b0 && count <= 4'd3)
+                led7_out <= {reg0, reg1, reg2, 4'b1111};  // Hide reg3
+            else
+                led7_out <= {reg0, reg1, reg2, reg3};  // Display reg3
+        end
+ 
+
+    // Register shift control on button press
+           always @(posedge clk_100hz or posedge reset) begin
+    if (reset) begin
+        reg3 <= 4'b1111;
         reg2 <= 4'b1111;
         reg1 <= 4'b1111;
         reg0 <= 4'b1111;
-        led7_out <= {reg0, reg1, reg2, reg3};
-        count <= 3'd1;
-    end
-    
-    3'd1: begin
+        count <= 0;
+    end else begin
         reg3 <= value_4bit;
-        reg2 <= reg3;
-        reg1 <= 4'b1111;
-        reg0 <= 4'b1111;
-        led7_out <= {reg0, reg1, reg2, reg3};
-        count <= 3'd2;
+
+        // Button edge detection
+        if (button) begin
+            case (count)
+                4'd0: begin
+                    reg2 <= reg3;
+                    reg1 <= 4'b1111;
+                    reg0 <= 4'b1111;
+                    count <= count + 4'd1;
+                end
+                4'd1: begin
+                    reg2 <= reg3;
+                    reg1 <= reg2;
+                    reg0 <= 4'b1111;
+                    count <= count + 4'd1;
+                end
+                4'd2: begin
+                    reg2 <= reg3;
+                    reg1 <= reg2;
+                    reg0 <= reg1;
+                    count <= count + 4'd1;
+                end
+                4'd3: begin
+                    count <= count + 4'd1;
+                end
+            endcase
+        end
     end
-    
-    3'd2: begin
-        reg1 <= reg2;
-        reg2 <= reg3;
-        reg3 <= value_4bit;  
-        reg0 <= 4'b1111;
-        led7_out <= {reg0, reg1, reg2, reg3};
-        count <= 3'd3;
-    end
-    
-    3'd3: begin
-        reg0 <= reg1;
-        reg1 <= reg2;
-        reg2 <= reg3;
-        reg3 <= value_4bit;
-        led7_out <= {reg0, reg1, reg2, reg3};
-        count <= 3'd0;
-    end
-    
-    default:
-    begin
-            reg0 <= 4'b1111; 
-            reg1 <= 4'b1111;
-            reg2 <= 4'b1111;
-            reg3 <= 4'b1111; 
-            pw_16bit <= 16'b0; 
-            count <= 3'd0; 
-    end
-    endcase
-    end
-    
-    //sau 4 lần confirm -> pw_16bit nhận giá trị 
-    always@(posedge clk_1hz) begin
-    if (reg0 != 4'b1111 && reg1 != 4'b1111 && reg2 != 4'b1111 && reg3 != 4'b1111) begin
-        pw_16bit <= {reg0, reg1, reg2, reg3};
-    end
-    end
-    
-    //khi nhận tín hiệu enb_count
-    always@(posedge enb_count) begin
-    led7_out <= led_cnt16;
-    end
-      
+end
+
+            
 endmodule
