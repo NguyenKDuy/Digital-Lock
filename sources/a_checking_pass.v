@@ -31,11 +31,8 @@ module a_checking_pass(
    
 );  
     wire d_enb_cmp;
-    wire clk_100hz;
-    reg [1:0] cnt = 0;
-    clk_divider #(.DIV(28'd100)) clk_out_3(clk_in,'d0, clk_100hz);  // tren mạch thật
-    
-    always @(posedge clk_100hz) begin
+    wire clk_100hz;   
+    always @(clk) begin
         if (reset) begin 
             enb_lock <= 1'd0;
             gen_rst <= 1'd0;
@@ -43,15 +40,13 @@ module a_checking_pass(
         else begin
             if (enough == 1'b1) begin
                 gen_rst <= 1'b1;
-                cnt <= cnt + 1'b1;
-                if (cnt == 'd3) begin
-                    cnt <= 'd0;
-                    gen_rst <= 1'b0;
-                end
                 if(pw_16bit == password)
                     enb_lock <= 1'd1;
                 else
                     enb_lock <= 1'd0;
+            end
+            else begin 
+                gen_rst <= 1'b0;
             end
         end     
     end

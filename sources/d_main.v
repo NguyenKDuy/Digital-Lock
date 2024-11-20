@@ -30,13 +30,13 @@ module d_main(
     input clk_in,                          //128Mhz
     output  enb_set,                         
     output  enb_inp,                         
-    output  reset,                           
-    output  [9:0] led_cnt,
-    output  [2:0] rgb_out
-    );
+    output  reset,      
+    output  [9:0] led_cnt,      
+    output  [2:0] rgb_out               
     
+    
+    );
     wire [2:0] led_rgb;
-    wire rgb_toggle;
     d_module_timer D1 (
     .enb_lock(enb_lock)                         
     ,.disable_cnt(disable_cnt)                      
@@ -50,11 +50,14 @@ module d_main(
     ,.reset(reset)                           
     ,.led_cnt(led_cnt)
     ,.led_rgb(led_rgb)
-    ,.rgb_toggle(rgb_toggle));    
+    ,.rgb_toggle(rgb_toggle)
+    ,.idle(idle));    
     
     d_module_led_rgb D2 (
     .rgb_toggle(rgb_toggle)
     ,.led_rgb(led_rgb)
     ,.clk_in(clk_in)                    //125mhz
-    ,.rgb_out(rgb_out));
+    ,.idle(idle)
+    ,.rgb_out(rgb_out)
+    );
 endmodule

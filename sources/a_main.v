@@ -25,7 +25,6 @@ module a_main(
     input [15:0] password,
     input enough,
     input reset,
-    input rst_out,
     input clk,
     output enb_lock,
     output gen_stop,
@@ -47,7 +46,7 @@ module a_main(
     a_error_processer ep (
         .gen_rst(gen_rst), 
         .rst_in(enb_lock),  
-        .rst_out(rst_out), 
+        .rst_out(reset), 
         .gen_stop(gen_stop),
         .error_counter(error_counter)
     );   

@@ -20,16 +20,33 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module button_push(
-input clk_in,button,
-output out
-    );
-    wire clk_out;
-    wire Q1,Q2,Q2_bar;
-    clk_divider #(.DIV(28'd200)) button_clk_4hz (clk_in,'d0, clk_out); //DIV 4 // timer 20ms
-    DFF d1(clk_out,button,Q1);
-    DFF d2(clk_out,Q1,Q2,Q2_bar);
-    assign out = Q1 & Q2_bar;           //3 times 20ms
+    input clk_in, button_in,
+    output reg button_out = 'd0,
+    output reg [27:0] counter = 28'd0 
+);
+
+//reg [27:0] counter = 28'd0;
+wire clk_1000hz;
+clk_divider #(.DIV(28'd1000)) clk_1ms(clk_in, 'd0, clk_12500hz);        //ng?t 1ms
+//clk:12500hz 
+always @(posedge clk_12500hz) begin
+    if (button_in) begin
+        counter <= counter + 28'd1;
+        if (counter >= 28'd15) begin // counter dem 250 = 20ms
+            button_out <= 1'd1;
+        end
+        if (counter >= 28'd1000) begin // do dai tin hieu = 20ms
+            button_out <= 1'd0;
+        end
+    end
+    else begin
+        counter <=28'd0;
+        button_out <= 1'd0;
+    end
+end
+
 endmodule
+
 
 module button_press(
 input clk_in,button,

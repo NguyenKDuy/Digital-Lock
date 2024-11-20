@@ -28,13 +28,15 @@ module mergeALL(
     output [15:0] led7_out,
     output [2:0] rgb,
     output lock_status
-    ,output [15:0] value_16bit
-    ,output [15:0] pw_16bit
-    ,output gen_rst
-    ,output [2:0] error_counter
-    ,output [9:0] led_cnt
-    ,output enb_inp
-    ,output [3:0] count
+//    ,output [15:0] value_16bit
+//    ,output [15:0] pw_16bit
+//    ,output gen_rst
+//    ,output [2:0] error_counter
+//    ,output [9:0] led_cnt
+//    ,output enb_inp
+//    ,output enough
+//    ,output button_out
+//    ,output  [3:0] count
     );
     wire enb_lock, gen_stop;
     wire [2:0] error_counter;
@@ -45,8 +47,12 @@ module mergeALL(
     wire [15:0] value_16bit;
     wire [15:0] pw_16bit;
     wire [15:0] password;
+    wire gen_rst, disable_cnt;
+    wire enb_inp, enb_set;
     assign pw_16bit = (enb_lock == 1'b0) ? value_16bit : 'd0;
     assign np_16bit = (enb_lock == 1'b1) ? value_16bit : 'd0;
+    wire enough;
+    
     l_seg_display L0(.clk_in (clk)
                     ,.confirm(btn0)
                     ,.reset(gen_rst)
@@ -56,27 +62,28 @@ module mergeALL(
                     ,.led7_out(led7_out)
                     ,.pw_16bit(value_16bit)
                     ,.enough(enough)
+                    ,.button_out(button_out)
                     ,.count(count)
                     );
-    
+                     
     a_main M1(
                 .pw_16bit(pw_16bit)
                 ,.password(password)
                 ,.enough(enough)
                 ,.reset(reset)                  //get from M2
-                ,.rst_out(enb_inp)              //get from M2
                 ,.clk(clk)
                 ,.enb_lock(enb_lock)
                 ,.gen_stop(gen_stop)
                 ,.error_counter(error_counter)
                 ,.gen_rst(gen_rst)
                 );
+
                 
     d_main M2 (
                 .enb_lock(enb_lock)                         
                 ,.disable_cnt(disable_cnt)                      
                 ,.enb_cnt(lock_status)
-                ,.ignore(enb_cmp)
+                ,.ignore(btn0)
                 ,.gen_stop(gen_stop)
                 ,.error_counter(error_counter)
                 ,.clk_in(clk)                          
@@ -101,7 +108,7 @@ module mergeALL(
     h_un_lock H1(.clk_in(clk)
                     ,.enb_lock(enb_lock)
                     ,.disable_cnt(disable_cnt)
-                    ,.button(btn1_out)
+                    ,.button(btn1)
                     ,.enb_cnt(lock_status)
                     );
 endmodule
