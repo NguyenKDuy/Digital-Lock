@@ -36,13 +36,13 @@ module d_module_led_rgb(
     localparam BLUE = 3'b100;
     
     clk_divider #(.DIV(28'd4)) clock_1HZ (clk_in, idle, clk_1hz);
-    always @(clk_1hz) begin 
+    always @(posedge clk_1hz) begin 
         if (rgb_toggle == 1'b1) begin 
             if (rgb_out == OFF) begin
-                rgb_out = led_rgb;
+                rgb_out <= led_rgb;
             end
             else begin
-                rgb_out = OFF;
+                rgb_out <= OFF;
             end
         end
         else begin

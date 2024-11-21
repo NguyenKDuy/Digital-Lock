@@ -32,7 +32,7 @@ module a_checking_pass(
 );  
     wire d_enb_cmp;
     wire clk_100hz;   
-    always @(clk) begin
+    always @(posedge clk or posedge enough) begin
         if (reset) begin 
             enb_lock <= 1'd0;
             gen_rst <= 1'd0;

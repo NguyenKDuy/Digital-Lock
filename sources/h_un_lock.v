@@ -31,7 +31,7 @@ module h_un_lock(
     button_push B1 (clk_in, button, d_button);
 
     
-    always @(negedge d_button) begin
+    always @(posedge d_button) begin
         if (enb_lock && !disable_cnt) begin
             enb_cnt <= ~enb_cnt;  
         end

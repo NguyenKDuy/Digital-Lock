@@ -44,7 +44,7 @@ module l_seg_display(
  
 
     // Register shift control on button
-    always @(posedge button or posedge reset) begin
+    always @(posedge (button & !enb_count) or posedge reset) begin
         if (reset) begin
             reg2 <= 4'b1111;
             reg1 <= 4'b1111;

@@ -107,7 +107,7 @@ module d_module_timer(
     always @(posedge clk_in) begin    
         if (idle == 1'b1) begin 
             state <= IDLE;
-            pre_state <= IDLE;
+            
             pre_state <= state;
             pulse_count <= 1'b1;
             reset <= 1'b1;    

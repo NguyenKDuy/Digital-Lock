@@ -26,14 +26,14 @@ module h_newlock_v2(
           		[15:0] value_16bit,
           		confirm_button,
          		 clk_in,
-    output 	reg disable_cnt = 'd0,
-            reg [15:0] password = 16'd0
+        output 	reg disable_cnt = 'd0,
+                reg [15:0] password = 16'd0
     );
 
            reg[3:0] three_time_counter=4'd0;
            reg[3:0] button_push_counter=4'd0;
            wire button_push_confirm, button_push_exit, button_push_3s_exit;
-           button_push B0(clk_in, confirm_button,button_push_confirm);
+           button_push B0(clk_in, confirm_button, button_push_confirm);
            button_push B1(clk_in, exit_button,button_push_exit);
            button_press B2(clk_in, exit_button,button_push_3s_exit);
 
