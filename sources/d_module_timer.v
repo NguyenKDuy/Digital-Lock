@@ -58,11 +58,11 @@ module d_module_timer(
     
     //LED RGB:
     localparam OFF = 3'b000;
-    localparam RED = 3'b001;
+    localparam RED = 3'b100;
     localparam GREEN = 3'b010;
-    localparam YELLOW = 3'b011;
+    localparam YELLOW = 3'b110;
     localparam WHITE = 3'b111;
-    localparam BLUE = 3'b100;
+    localparam BLUE = 3'b001;
     
     
     reg evcp = 1'b0; 
@@ -107,19 +107,17 @@ module d_module_timer(
     always @(posedge clk_in) begin    
         if (idle == 1'b1) begin 
             state <= IDLE;
-            
             pre_state <= state;
             pulse_count <= 1'b1;
             reset <= 1'b1;    
         end
         else begin
-            
             if (reset) begin 
                 reset <=1'b0;
             end   
             
             //TODO: IDENTIFY CORRECT CASES
-            if (correct == 1'b1) begin 
+            if (enb_lock == 1'b1) begin 
                 //TODO: WAIT
                 if (!evop && !evcp && !exit) begin
                     state <= WAIT;
@@ -152,12 +150,12 @@ module d_module_timer(
             //TODO: IDENTIFY WRONG CASES
             else begin 
                 //TODO: WRONG 1st, 2nd time
-                if (incorrect == 1'b1 && (error_counter == 'd1 || error_counter == 'd2)) begin 
+                if (gen_stop == 1'b1 && (error_counter == 'd1 || error_counter == 'd2)) begin 
                     state = WARNING;
                     pre_state <= state;
                 end
                 //TODO: WRONG 3 times continously above
-                else if (incorrect == 1'b1 && error_counter > 'd2) begin 
+                else if (gen_stop == 1'b1 && error_counter > 'd2) begin 
                     state <= WRONG;
                     pre_state <= state;
                 end
@@ -210,6 +208,7 @@ module d_module_timer(
                 cw10 <= 'd10;
                 cl10 <= 'd10;
                 idle <= 1'd0;
+                wrong_timer_minus <= 'd0;
             end
             WAIT: begin 
                 enb_set <= 1'b1;
@@ -264,7 +263,7 @@ module d_module_timer(
                 led_rgb <= RED;
                 rgb_toggle <= 1'b1;
                 //TODO:
-                led_cnt <= (((error_counter - 'd3)*(error_counter - 'd3) + 1)*'d60) - wrong_timer_minus;
+                led_cnt <= (((error_counter - 'd3)*(error_counter - 'd3) + 1'd1)*'d60) - wrong_timer_minus;
                 wrong_timer_minus <= wrong_timer_minus + 1'b1;
                 if (wrong_timer_minus == (((error_counter - 'd3)*(error_counter - 'd3) + 1)*'d60)) begin      
                     idle <= 1'b1;

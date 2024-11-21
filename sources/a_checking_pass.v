@@ -32,21 +32,21 @@ module a_checking_pass(
 );  
     wire d_enb_cmp;
     wire clk_100hz;   
-    always @(posedge clk or posedge enough) begin
+    always @(*) begin
         if (reset) begin 
-            enb_lock <= 1'd0;
-            gen_rst <= 1'd0;
+            enb_lock = 1'd0;
+            gen_rst = 1'd0;
         end
         else begin
             if (enough == 1'b1) begin
-                gen_rst <= 1'b1;
+                gen_rst = 1'b1;
                 if(pw_16bit == password)
-                    enb_lock <= 1'd1;
+                    enb_lock = 1'd1;
                 else
-                    enb_lock <= 1'd0;
+                    enb_lock = 1'd0;
             end
             else begin 
-                gen_rst <= 1'b0;
+                gen_rst = 1'b0;
             end
         end     
     end

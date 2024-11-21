@@ -62,8 +62,8 @@ module mergeALL(
                     ,.led7_out(led7_out)
                     ,.pw_16bit(value_16bit)
                     ,.enough(enough)
-                    ,.button_out(button_out)
-                    ,.count(count)
+//                    ,.button_out(button_out)
+//                    ,.count(count)
                     );
                      
     a_main M1(

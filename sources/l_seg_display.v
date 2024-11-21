@@ -5,8 +5,8 @@ module l_seg_display(
     output reg [15:0] led7_out = 16'hFFFF, 
     output reg [15:0] pw_16bit,
     output reg enough = 1'b0
-    ,output button_out
-    ,output reg [3:0] count
+//    ,output button_out
+//    ,output reg [3:0] count
 );
 
     reg [27:0] blink_counter = 28'd0;
@@ -44,7 +44,7 @@ module l_seg_display(
  
 
     // Register shift control on button
-    always @(posedge (button & !enb_count) or posedge reset) begin
+    always @(posedge (button) or posedge reset) begin
         if (reset) begin
             reg2 <= 4'b1111;
             reg1 <= 4'b1111;
@@ -54,7 +54,7 @@ module l_seg_display(
         end 
         else begin
         // Button edge detection
-        if (button) begin
+        if (button & !enb_count) begin
             case (count)
                 4'd0: begin
                     reg2 <= reg3;
