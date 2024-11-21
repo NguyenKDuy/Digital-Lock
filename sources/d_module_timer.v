@@ -35,6 +35,8 @@ module d_module_timer(
     output reg [2:0] led_rgb = 'd0,
     output reg rgb_toggle = 'd0,
     output reg idle = 'd0
+    ,output clocked_1hz
+    ,output clk_1hz
     //spare for addition tests
 //    ,output reg [2:0] state 
 //    ,output reg [2:0] pre_state
@@ -143,7 +145,8 @@ module d_module_timer(
                     else begin 
                         state <= OPEN;
                         pre_state <= state;
-                    end                end
+                    end                
+                end
                 //ANOTHER CASE INVALID
                 else begin end 
             end 
@@ -175,7 +178,7 @@ module d_module_timer(
     
     always @(posedge clocked_1hz) begin
         if (co30 > 'd0 && (state == CLOSE || state == OPEN)) begin 
-            co30 <= (co30 == 0) ? co30 : co30 - 1;       
+            co30 <= (co30 == 'd0) ? co30 : co30 - 1;       
         end
         else if (state == IDLE) begin
             co30 <= 'd30;

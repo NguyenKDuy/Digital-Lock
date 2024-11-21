@@ -39,15 +39,14 @@ module h_newlock_v2(
 
     always@(negedge button_push_confirm)
     begin
-        if (enb_set == 1'd1) begin
-            if (disable_cnt == 1'd1) begin
-                button_push_counter <= button_push_counter + 4'd1;
+        if(enb_set == 1'd1) begin
+            if(disable_cnt == 1'd1) begin
+            button_push_counter <= button_push_counter + 4'd1;
             end
-            
             three_time_counter <= three_time_counter + 4'd1;
-            if(three_time_counter >= 4'd3) begin
-                disable_cnt <= 1'd1;
-                three_time_counter <= 4'd0;
+            if(three_time_counter >= 4'd2) begin
+            disable_cnt <= 1'd1;
+            three_time_counter <= 4'd0;
             end   
         end 
     end

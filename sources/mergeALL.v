@@ -28,6 +28,8 @@ module mergeALL(
     output [15:0] led7_out,
     output [2:0] rgb,
     output lock_status
+    ,output clocked_1hz
+    ,output clk_1hz
 //    ,output [15:0] value_16bit
 //    ,output [15:0] pw_16bit
 //    ,output gen_rst
@@ -77,7 +79,7 @@ module mergeALL(
                 ,.error_counter(error_counter)
                 ,.gen_rst(gen_rst)
                 );
-
+    
                 
     d_main M2 (
                 .enb_lock(enb_lock)                         
@@ -92,6 +94,8 @@ module mergeALL(
                 ,.reset(reset)                           
                 ,.led_cnt(led_cnt)
                 ,.rgb_out(rgb)
+                ,.clocked_1hz(clocked_1hz)
+                ,.clk_1hz(clk_1hz)
                 );    
                 
     l_10_to_16bit L1(.led_cnt(led_cnt)

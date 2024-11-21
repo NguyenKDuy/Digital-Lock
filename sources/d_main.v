@@ -33,7 +33,8 @@ module d_main(
     output  reset,      
     output  [9:0] led_cnt,      
     output  [2:0] rgb_out               
-    
+    ,output clocked_1hz
+    ,output clk_1hz
     
     );
     wire [2:0] led_rgb;
