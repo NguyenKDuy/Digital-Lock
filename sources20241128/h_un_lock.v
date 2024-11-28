@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 10/17/2024 10:15:35 AM
+// Create Date: 11/01/2024 10:40:56 AM
 // Design Name: 
-// Module Name: DFF
+// Module Name: h_un_lock
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,20 +20,21 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module DFF(
-input clk,
-input D,
-output reg Q,
-output reg Qbar
+module h_un_lock(
+    input clk_in,
+          enb_lock,
+          disable_cnt,
+          button,
+    output reg enb_cnt = 1'd0
     );
-    initial 
-    begin
-    Q = 0;
-    Qbar = 1;
+    
+    button_push B1 (clk_in, button, d_button);
+
+    
+    always @(posedge d_button) begin
+        if (enb_lock && !disable_cnt) begin
+            enb_cnt <= ~enb_cnt;  
+        end
     end
-always@(posedge clk)
-begin
-Q<=D;
-Qbar<=!Q;    
-end
+    
 endmodule
