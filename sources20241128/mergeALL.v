@@ -29,6 +29,7 @@ module mergeALL(
     output [2:0] rgb,
     output lock_status,
     output eval
+    ,output disable_cnt
 //    ,output clocked_1hz
 //    ,output clk_1hz
 //    ,output [15:0] value_16bit

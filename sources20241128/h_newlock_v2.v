@@ -32,20 +32,20 @@ module h_newlock_v2(
                 reg [15:0] password = 16'd0
     );
 
-           reg[3:0] three_time_counter=4'd0;
+           reg[3:0] three_time_counter = 4'd0;
            wire button_push_confirm, button_push_exit, button_push_3s_exit;
-           button_push B0(clk_in, enb_inp & confirm_button, button_push_confirm);
-           button_push_v1 B1(clk_in,  exit_button,button_push_exit);
-           button_press B2(clk_in, exit_button,button_push_3s_exit);
+           button_push B0(clk_in, confirm_button, button_push_confirm);
+           button_push B1(clk_in,  exit_button, button_push_exit);
+           button_press B2(clk_in, exit_button, button_push_3s_exit);
     
     
     always @(posedge button_push_confirm or posedge button_push_3s_exit or negedge button_push_exit)
     begin
-        if (button_push_confirm && !disable_cnt && enb_set) begin
-             three_time_counter <= three_time_counter + 4'd1;
-            if(three_time_counter >= 4'd2) begin
+        if (button_push_confirm && !disable_cnt && enb_set && enb_inp) begin
+//            three_time_counter <= three_time_counter + 4'd1;
+//            if(three_time_counter >= 4'd2) begin
                 disable_cnt <= 1'd1;
-            end   
+//            end   
         end
         
         else if(disable_cnt == 1'd1) begin

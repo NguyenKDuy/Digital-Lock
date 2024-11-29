@@ -86,21 +86,26 @@ module d_module_timer(
     reg idle = 'd0;
     button_push B2 (clk_in, ignore, ignore_sta);
     
-    always @(enb_cnt, state) begin 
-        if (enb_lock == 1'b1 && enb_cnt == 1'b1 && disable_cnt == 1'b0 && evop == 1'b0 && evcp == 1'b0 && state == WAIT) evop = 1'b1;
-        if (state == IDLE) begin
-            evop = 1'b0;
+    always @(posedge enb_cnt, posedge idle) begin 
+        if (idle) begin
+            evop <= 'd0;   
         end
+        else if (enb_lock == 1'b1 && enb_cnt == 1'b1 && disable_cnt == 1'b0 && evop == 1'b0 && evcp == 1'b0 && state == WAIT) evop <= 1'b1;
+        
     end
     
-    always @(disable_cnt,state) begin 
-        if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b1 && evop == 1'b0 && evcp == 1'b0 && state == WAIT) evcp = 1'b1;
-        else if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b0 && evop == 1'b0 && evcp == 1'b1 && state == NEW) exit = 1'b1;
-        
-        if (state == IDLE) begin
-            evcp = 'd0;
-            exit = 'd0;
+    always @(posedge disable_cnt, posedge idle) begin 
+        if (idle) begin
+            evcp <= 'd0;            
         end
+        else if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b1 && evop == 1'b0 && evcp == 1'b0 && state == WAIT) evcp <= 1'b1;        
+    end
+    
+    always @(negedge disable_cnt, posedge idle) begin
+        if (idle) begin
+            exit <= 'd0;  
+        end
+        else if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b0 && evop == 1'b0 && evcp == 1'b1 && state == NEW) exit <= 1'b1;
     end
     
     
@@ -169,7 +174,7 @@ module d_module_timer(
             pulse_count <= 1'b1;
         end    
     end
-    
+   
     //TODO: There are 2 types of 1Hz clock, non-stop(without reset) and with reset.
     clk_divider #(.DIV(28'd1)) clock_1hz (clk_in, pulse_count, clk_1hz);
     clk_divider #(.DIV(28'd1)) clock_1hz_ns (evop & clk_in, 1'b0, clk_1hz_ns); 
@@ -177,12 +182,14 @@ module d_module_timer(
     and A0 (clocked_1hz, clk_1hz_ns, !eval, !evig);
     
     always @(posedge clocked_1hz, posedge idle) begin
-        if (co30 > 'd0 && evop == 'd1) begin 
-            co30 <= (co30 == 'd0) ? co30 : co30 - 1;       
-        end
-        else if (idle == 1'd1) begin
+         if (idle == 1'd1) begin
             co30 <= 'd30;
         end 
+        else begin
+            if (co30 > 'd0 && evop == 'd1) begin 
+                co30 <= (co30 == 'd0) ? co30 : co30 - 1;       
+            end
+        end
     end   
     
     always @(posedge (clk_in)) begin
@@ -229,7 +236,7 @@ module d_module_timer(
                 cl10 <= 5'd10;      // reset close counter
                 enb_set <= 0;
                 enb_inp <= 1;       
-                led_rgb <= YELLOW;
+                led_rgb <= BLUE;
                 rgb_toggle <= 1'b0;
                 led_cnt <= co30;
 //                TODO:
