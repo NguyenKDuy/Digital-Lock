@@ -91,81 +91,6 @@ module d_module_timer(
         else if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b1 && evop == 1'b0 && evcp == 1'b0 && state == WAIT) evcp <= 1'b1;        
     end
     
-//    always @(negedge disable_cnt, posedge idle) begin
-//        if (idle) begin
-//            exit <= 'd0;  
-//        end
-//        else if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b0 && evop == 1'b0 && evcp == 1'b1) exit <= 1'b1;
-//    end
-    
-    
-    and A1 (incorrect, gen_stop, !enb_lock); 
-    and A2 (correct, enb_lock, !gen_stop);
-    
-//    always @(posedge clk_in) begin    
-//        if (idle == 1'b1) begin 
-//            state <= IDLE;
-//            pre_state <= state;
-//            reset <= 1'b1;    
-//        end
-//        else begin
-//            if (reset) begin 
-//                reset <=1'b0;
-//            end   
-            
-//            //TODO: IDENTIFY CORRECT CASES
-//            if (enb_lock == 1'b1) begin 
-//                //TODO: WAIT
-//                if (!evop && !evcp && !exit) begin
-//                    state <= WAIT;
-//                    pre_state <= state;
-//                end
-//                 //TODO: EXIT
-//                else if (!evop && evcp && !disable_cnt) begin 
-//                    state <= EXIT;
-//                    pre_state <= state;
-//                end 
-//                //TODO: NEW PASS
-//                else if (!evop && evcp && !exit) begin 
-//                    state <= NEW;
-//                    pre_state <= state;
-//                end
-                 
-//                //TODO: CLOSE 
-//                else if (evop && !evcp && !exit) begin 
-//                    if (enb_cnt == 1'b0) begin 
-//                        state <= CLOSE;
-//                        pre_state <= state;
-//                    end
-//                //TODO: OPEN
-//                    else begin 
-//                        state <= OPEN;
-//                        pre_state <= state;
-//                    end                
-//                end
-//                //ANOTHER CASE INVALID
-//                else begin end 
-//            end 
-//            //TODO: IDENTIFY WRONG CASES
-//            else begin 
-//                //TODO: WRONG 1st, 2nd time
-//                if (gen_stop == 1'b1 && (error_counter == 'd1 || error_counter == 'd2)) begin 
-//                    state = WARNING;
-//                    pre_state <= state;
-//                end
-//                //TODO: WRONG 3 times continously above
-//                else if (gen_stop == 1'b1 && error_counter > 'd2) begin 
-//                    state <= WRONG;
-//                    pre_state <= state;
-//                end
-//            end 
-//        end  
-//        if (pulse_count) pulse_count <= 'd0;
-//        if (pre_state != state) begin
-//            pulse_count <= 1'b1;
-//        end    
-//    end
-
     always @(posedge clk_in) begin    
         if (idle == 1'b1) begin 
             state <= IDLE;
@@ -253,9 +178,15 @@ module d_module_timer(
             eval <= 1'b0;
             evig <= 1'b1;
         end
+        
         else if (co30 == 'd0 && state == OPEN && !eval && !evig) begin 
             eval <= 1'b1;
         end
+        
+        else if (co30 == 'd0 && state == OPEN && !eval && evig && pre_state == CLOSE) begin
+            evig <= 1'b0;   
+        end
+        
         else if (state == IDLE) begin
             eval <= 1'b0;
             evig <= 1'b0;

@@ -35,8 +35,13 @@ module l_seg_display(
             end
             
             // Toggle display between showing reg3 and hiding it
-            if (toggle_display == 1'b0 && count <= 4'd3)
-                led7_out <= {reg0, reg1, reg2, 4'b1111};  
+            if (toggle_display == 1'b0 && count <= 4'd3) begin
+                led7_out <= {reg0, reg1, reg2, 4'b1111};
+                if (button) begin
+                    toggle_display <= ~toggle_display;
+                    led7_out <= {reg0, reg1, reg2, reg3};
+                end 
+            end
             else if (toggle_display == 1'b1 && count <= 4'd3)
                 led7_out <= {reg0, reg1, reg2, reg3}; 
             end
@@ -87,17 +92,3 @@ end
 
             
 endmodule
-
-//module clk_divider_v1(
-//input clk_ht, output reg clk_di);
-//reg [27:0] counter=28'd0;
-//localparam CLK = 28'd125_000_000;
-//parameter DIV = 28'd1;
-
-//always @(posedge clk_ht)
-//begin
-//counter <= counter + 28'd1;
-//if(counter >= CLK/DIV - 1) counter <= 28'd0;
-//clk_di <= (counter<CLK/(2*DIV))?1'b1:1'b0; 
-//end
-//endmodule
