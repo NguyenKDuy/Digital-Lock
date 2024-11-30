@@ -36,18 +36,8 @@ module d_module_timer(
     output reg rgb_toggle = 'd0,
     output reg idle = 'd0,
     output reg eval = 1'b0
-//    ,output clocked_1hz
-//    ,output clk_1hz
-    //spare for addition tests
-//    ,output reg [2:0] state 
-//    ,output reg [2:0] pre_state
-//    ,output reg [4:0] co30
-//    ,output reg [4:0] cl10
-//    ,output reg [9:0] wrong_count
-//    ,output reg eval
-//    ,output reg idle
-//    ,output reg pulse_count
-//    ,output ignore_sta
+    ,output reg evcp = 1'b0
+    ,output reg evop = 1'b0
     );
     //States
     localparam IDLE = 3'b000;
@@ -83,7 +73,7 @@ module d_module_timer(
     //Wrong case
     reg [9:0] wrong_timer_minus = 'd0;
     reg [2:0] state = 'd0;
-    reg idle = 'd0;
+//    reg idle = 'd0;
     button_push B2 (clk_in, ignore, ignore_sta);
     
     always @(posedge enb_cnt, posedge idle) begin 
@@ -101,17 +91,81 @@ module d_module_timer(
         else if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b1 && evop == 1'b0 && evcp == 1'b0 && state == WAIT) evcp <= 1'b1;        
     end
     
-    always @(negedge disable_cnt, posedge idle) begin
-        if (idle) begin
-            exit <= 'd0;  
-        end
-        else if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b0 && evop == 1'b0 && evcp == 1'b1 && state == NEW) exit <= 1'b1;
-    end
+//    always @(negedge disable_cnt, posedge idle) begin
+//        if (idle) begin
+//            exit <= 'd0;  
+//        end
+//        else if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b0 && evop == 1'b0 && evcp == 1'b1) exit <= 1'b1;
+//    end
     
     
     and A1 (incorrect, gen_stop, !enb_lock); 
     and A2 (correct, enb_lock, !gen_stop);
     
+//    always @(posedge clk_in) begin    
+//        if (idle == 1'b1) begin 
+//            state <= IDLE;
+//            pre_state <= state;
+//            reset <= 1'b1;    
+//        end
+//        else begin
+//            if (reset) begin 
+//                reset <=1'b0;
+//            end   
+            
+//            //TODO: IDENTIFY CORRECT CASES
+//            if (enb_lock == 1'b1) begin 
+//                //TODO: WAIT
+//                if (!evop && !evcp && !exit) begin
+//                    state <= WAIT;
+//                    pre_state <= state;
+//                end
+//                 //TODO: EXIT
+//                else if (!evop && evcp && !disable_cnt) begin 
+//                    state <= EXIT;
+//                    pre_state <= state;
+//                end 
+//                //TODO: NEW PASS
+//                else if (!evop && evcp && !exit) begin 
+//                    state <= NEW;
+//                    pre_state <= state;
+//                end
+                 
+//                //TODO: CLOSE 
+//                else if (evop && !evcp && !exit) begin 
+//                    if (enb_cnt == 1'b0) begin 
+//                        state <= CLOSE;
+//                        pre_state <= state;
+//                    end
+//                //TODO: OPEN
+//                    else begin 
+//                        state <= OPEN;
+//                        pre_state <= state;
+//                    end                
+//                end
+//                //ANOTHER CASE INVALID
+//                else begin end 
+//            end 
+//            //TODO: IDENTIFY WRONG CASES
+//            else begin 
+//                //TODO: WRONG 1st, 2nd time
+//                if (gen_stop == 1'b1 && (error_counter == 'd1 || error_counter == 'd2)) begin 
+//                    state = WARNING;
+//                    pre_state <= state;
+//                end
+//                //TODO: WRONG 3 times continously above
+//                else if (gen_stop == 1'b1 && error_counter > 'd2) begin 
+//                    state <= WRONG;
+//                    pre_state <= state;
+//                end
+//            end 
+//        end  
+//        if (pulse_count) pulse_count <= 'd0;
+//        if (pre_state != state) begin
+//            pulse_count <= 1'b1;
+//        end    
+//    end
+
     always @(posedge clk_in) begin    
         if (idle == 1'b1) begin 
             state <= IDLE;
@@ -126,22 +180,23 @@ module d_module_timer(
             //TODO: IDENTIFY CORRECT CASES
             if (enb_lock == 1'b1) begin 
                 //TODO: WAIT
-                if (!evop && !evcp && !exit) begin
+                if (!evop && !evcp ) begin
                     state <= WAIT;
                     pre_state <= state;
                 end
+                 //TODO: EXIT
+                else if (!evop && evcp && !disable_cnt) begin 
+                    state <= EXIT;
+                    pre_state <= state;
+                end 
                 //TODO: NEW PASS
-                else if (!evop && evcp && !exit) begin 
+                else if (!evop && evcp && disable_cnt) begin 
                     state <= NEW;
                     pre_state <= state;
                 end
-                //TODO: EXIT
-                else if (!evop && evcp && exit) begin 
-                    state <= EXIT;
-                    pre_state <= state;
-                end   
+                 
                 //TODO: CLOSE 
-                else if (evop && !evcp && !exit) begin 
+                else if (evop && !evcp && !disable_cnt) begin 
                     if (enb_cnt == 1'b0) begin 
                         state <= CLOSE;
                         pre_state <= state;
@@ -174,6 +229,7 @@ module d_module_timer(
             pulse_count <= 1'b1;
         end    
     end
+    
    
     //TODO: There are 2 types of 1Hz clock, non-stop(without reset) and with reset.
     clk_divider #(.DIV(28'd1)) clock_1hz (clk_in, pulse_count, clk_1hz);
@@ -264,6 +320,8 @@ module d_module_timer(
                 rgb_toggle <= 1'b0;
             end
             EXIT: begin 
+                enb_set <= 0;
+                enb_inp <= 0;
                 led_rgb <= OFF;
                 idle <= 1'b1;
             end

@@ -30,6 +30,11 @@ module mergeALL(
     output lock_status,
     output eval
     ,output disable_cnt
+    ,output enb_set
+    ,output enb_inp
+    ,output evcp
+    ,output evop
+    ,output enb_lock
 //    ,output clocked_1hz
 //    ,output clk_1hz
 //    ,output [15:0] value_16bit
@@ -52,9 +57,8 @@ module mergeALL(
     wire [15:0] pw_16bit;
     wire [15:0] password;
     wire gen_rst, disable_cnt;
-    wire enb_inp, enb_set;
-    assign pw_16bit = (enb_lock == 1'b0) ? value_16bit : 'd0;
-    assign np_16bit = (enb_lock == 1'b1) ? value_16bit : 'd0;
+//    assign pw_16bit = (enb_lock == 1'b0) ? value_16bit : 'd0;
+//    assign np_16bit = (enb_lock == 1'b1) ? value_16bit : 'd0;
     wire enough;
     
     l_seg_display L0(.clk_in (clk)
@@ -71,12 +75,13 @@ module mergeALL(
                     );
                      
     a_main M1(
-                .pw_16bit(pw_16bit)
+                .pw_16bit(value_16bit)
                 ,.password(password)
                 ,.disable_cnt(disable_cnt)
                 ,.enough(enough)
                 ,.reset(reset)               
                 ,.clk(clk)
+                ,.enb_lock1(enb_lock)
                 ,.enb_lock(enb_lock)
                 ,.gen_stop(gen_stop)
                 ,.error_counter(error_counter)
@@ -98,8 +103,10 @@ module mergeALL(
                 ,.led_cnt(led_cnt)                  
                 ,.rgb_out(rgb)
                 ,.eval(eval)
+                ,.evcp(evcp)
 //                ,.clocked_1hz(clocked_1hz)
 //                ,.clk_1hz(clk_1hz)
+                ,.evop(evop)
                 );    
                 
     l_10_to_16bit L1(.led_cnt(led_cnt)
@@ -110,7 +117,7 @@ module mergeALL(
                     ,.enb_set(enb_set)
                     ,.exit_button(btn1)
                     ,.enough(enough)
-                    ,.value_16bit(np_16bit)
+                    ,.value_16bit(value_16bit)
                     ,.confirm_button(btn0)
                     ,.clk_in(clk)
                     ,.disable_cnt(disable_cnt)

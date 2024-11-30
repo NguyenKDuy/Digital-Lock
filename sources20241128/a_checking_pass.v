@@ -27,19 +27,20 @@ module a_checking_pass(
     input enough,
     input reset, 
     input clk,
+    input enb_lock1,
     output reg enb_lock = 1'd0,
     output reg gen_rst = 1'd0
    
 );  
     wire d_enb_cmp;
     wire clk_100hz;   
-    always @(*) begin
+    always @(pw_16bit, disable_cnt, enough, reset) begin
         if (reset) begin 
             enb_lock = 1'd0;
             gen_rst = 1'd0;
         end
         else begin
-            if (enough == 1'b1 && !disable_cnt) begin
+            if (enough == 1'b1 && !disable_cnt && !enb_lock1) begin
                 gen_rst = 1'b1;
                 if(pw_16bit == password)
                     enb_lock = 1'd1;

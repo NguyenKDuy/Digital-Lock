@@ -27,6 +27,7 @@ module a_main(
     input enough,
     input reset,
     input clk,
+    input enb_lock1,
     output enb_lock,
     output gen_stop,
     output [2:0] error_counter,
@@ -41,6 +42,7 @@ module a_main(
         .enough(enough),
         .reset(reset),
 //        .clk(clk),
+        .enb_lock1(enb_lock1),
         .enb_lock(enb_lock),
         .gen_rst(gen_rst)
     );

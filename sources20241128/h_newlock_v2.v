@@ -18,8 +18,6 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-
-
 module h_newlock_v2(
         input 	enb_inp,
                 enb_set,
@@ -30,38 +28,33 @@ module h_newlock_v2(
          		clk_in,
         output 	reg disable_cnt = 'd0,
                 reg [15:0] password = 16'd0
+                
+             
     );
-
+           reg reset = 1'd0;
            reg[3:0] three_time_counter = 4'd0;
-           wire button_push_confirm, button_push_exit, button_push_3s_exit;
-           button_push B0(clk_in, confirm_button, button_push_confirm);
-           button_push B1(clk_in,  exit_button, button_push_exit);
+           wire button_push_exit, button_push_3s_exit;
+           button_push_v2 B0(clk_in, confirm_button, button_push_confirm);
+           button_push_v1 B1(clk_in,  exit_button, button_push_exit);
            button_press B2(clk_in, exit_button, button_push_3s_exit);
     
-    
-    always @(posedge button_push_confirm or posedge button_push_3s_exit or negedge button_push_exit)
-    begin
-        if (button_push_confirm && !disable_cnt && enb_set && enb_inp) begin
-//            three_time_counter <= three_time_counter + 4'd1;
-//            if(three_time_counter >= 4'd2) begin
+    always @(posedge clk_in) begin
+        if (!disable_cnt) begin
+             if (button_push_confirm && enb_inp && enb_set) begin
                 disable_cnt <= 1'd1;
-//            end   
+             end
         end
-        
-        else if(disable_cnt == 1'd1) begin
-            if(button_push_3s_exit && enough) begin
+        else begin
+            if (button_push_3s_exit && enough) begin
                 password <= value_16bit;
                 disable_cnt <= 1'd0;
-                three_time_counter <= 4'd0;
             end
-    
-            else if(!button_push_exit) begin
+            else if (!button_push_exit) begin
                 disable_cnt <= 1'd0;
-                three_time_counter <= 4'd0; 
             end
-        end 
+        end
     end
-  
+      
 endmodule
 
 

@@ -33,7 +33,9 @@ module d_main(
     output  reset,      
     output  [9:0] led_cnt,      
     output  [2:0] rgb_out,     
-    output  eval        
+    output  eval
+    ,output evcp  
+    ,output evop      
     );
     wire [2:0] led_rgb;
     d_module_timer D1 (
@@ -52,6 +54,8 @@ module d_main(
     ,.rgb_toggle(rgb_toggle)
     ,.idle(idle)
     ,.eval(eval)
+    ,.evcp(evcp)
+    ,.evop(evop)
     );    
     
     d_module_led_rgb D2 (
