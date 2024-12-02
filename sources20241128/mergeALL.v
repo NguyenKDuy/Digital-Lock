@@ -1,24 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 11/13/2024 11:21:30 AM
-// Design Name: 
-// Module Name: mergeALL
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module mergeALL(
     input btn0,
@@ -29,25 +9,8 @@ module mergeALL(
     output [2:0] rgb,
     output lock_status,
     output eval
-    ,output disable_cnt
-    ,output enb_set
-    ,output enb_inp
-    ,output evcp
-    ,output evop
-    ,output enb_lock
-//    ,output clocked_1hz
-//    ,output clk_1hz
-//    ,output [15:0] value_16bit
-//    ,output [15:0] pw_16bit
-//    ,output gen_rst
-//    ,output [2:0] error_counter
-//    ,output [9:0] led_cnt
-//    ,output enb_inp
-//    ,output enough
-//    ,output button_out
-//    ,output  [3:0] count
+
     );
-    wire enb_lock, gen_stop;
     wire [2:0] error_counter;
     wire [15:0] led_cnt16;
     wire [9:0] led_cnt;
@@ -56,22 +19,20 @@ module mergeALL(
     wire [15:0] value_16bit;
     wire [15:0] pw_16bit;
     wire [15:0] password;
-    wire gen_rst, disable_cnt;
-//    assign pw_16bit = (enb_lock == 1'b0) ? value_16bit : 'd0;
-//    assign np_16bit = (enb_lock == 1'b1) ? value_16bit : 'd0;
+
     wire enough;
     
+    button_push B0 (clk, btn1, sta_btn1);
+    assign clear = sta_btn1 & !enb_lock & !enb_inp;
     l_seg_display L0(.clk_in (clk)
                     ,.confirm(btn0)
-                    ,.reset(gen_rst | reset)
+                    ,.reset(gen_rst | reset | clear)
                     ,.enb_count(enb_inp)
                     ,.led_cnt16(led_cnt16)
                     ,.value_4bit(sw)
                     ,.led7_out(led7_out)
                     ,.pw_16bit(value_16bit)
                     ,.enough(enough)
-//                    ,.button_out(button_out)
-//                    ,.count(count)
                     );
                      
     a_main M1(
@@ -80,8 +41,6 @@ module mergeALL(
                 ,.disable_cnt(disable_cnt)
                 ,.enough(enough)
                 ,.reset(reset)               
-                ,.clk(clk)
-                ,.enb_lock1(enb_lock)
                 ,.enb_lock(enb_lock)
                 ,.gen_stop(gen_stop)
                 ,.error_counter(error_counter)
@@ -104,8 +63,6 @@ module mergeALL(
                 ,.rgb_out(rgb)
                 ,.eval(eval)
                 ,.evcp(evcp)
-//                ,.clocked_1hz(clocked_1hz)
-//                ,.clk_1hz(clk_1hz)
                 ,.evop(evop)
                 );    
                 
