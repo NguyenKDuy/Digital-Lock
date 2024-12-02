@@ -1,24 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 10/31/2024 08:54:33 PM
-// Design Name: 
-// Module Name: d_main
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module d_main(
     input enb_lock,                         
@@ -32,10 +12,10 @@ module d_main(
     output  enb_inp,                         
     output  reset,      
     output  [9:0] led_cnt,      
-    output  [2:0] rgb_out               
-    ,output clocked_1hz
-    ,output clk_1hz
-    
+    output  [2:0] rgb_out,     
+    output  eval
+    ,output evcp  
+    ,output evop      
     );
     wire [2:0] led_rgb;
     d_module_timer D1 (
@@ -52,7 +32,11 @@ module d_main(
     ,.led_cnt(led_cnt)
     ,.led_rgb(led_rgb)
     ,.rgb_toggle(rgb_toggle)
-    ,.idle(idle));    
+    ,.idle(idle)
+    ,.eval(eval)
+    ,.evcp(evcp)
+    ,.evop(evop)
+    );    
     
     d_module_led_rgb D2 (
     .rgb_toggle(rgb_toggle)

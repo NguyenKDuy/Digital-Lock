@@ -23,9 +23,9 @@
 module a_main(
     input [15:0] pw_16bit,
     input [15:0] password,
+    input disable_cnt,
     input enough,
     input reset,
-    input clk,
     output enb_lock,
     output gen_stop,
     output [2:0] error_counter,
@@ -36,9 +36,9 @@ module a_main(
     a_checking_pass cp (
         .pw_16bit(pw_16bit),
         .password(password),
+        .disable_cnt(disable_cnt),
         .enough(enough),
         .reset(reset),
-        .clk(clk),
         .enb_lock(enb_lock),
         .gen_rst(gen_rst)
     );

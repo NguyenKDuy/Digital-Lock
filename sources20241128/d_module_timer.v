@@ -1,24 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 10/26/2024 02:57:37 PM
-// Design Name: 
-// Module Name: d_module_timer
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module d_module_timer(
     input enb_lock,                         
@@ -34,19 +14,10 @@ module d_module_timer(
     output reg [9:0] led_cnt = 'd0,
     output reg [2:0] led_rgb = 'd0,
     output reg rgb_toggle = 'd0,
-    output reg idle = 'd0
-    ,output clocked_1hz
-    ,output clk_1hz
-    //spare for addition tests
-//    ,output reg [2:0] state 
-//    ,output reg [2:0] pre_state
-//    ,output reg [4:0] co30
-//    ,output reg [4:0] cl10
-//    ,output reg [9:0] wrong_count
-//    ,output reg eval
-//    ,output reg idle
-//    ,output reg pulse_count
-//    ,output ignore_sta
+    output reg idle = 'd0,
+    output reg eval = 1'b0
+    ,output reg evcp = 1'b0
+    ,output reg evop = 1'b0
     );
     //States
     localparam IDLE = 3'b000;
@@ -78,39 +49,32 @@ module d_module_timer(
     reg [4:0] co30 = 'd30;
     reg [2:0] pre_state = IDLE;
     reg flash = 1'd1;
-    reg pulse_count;
+    reg pulse_count = 'd0;
     //Wrong case
     reg [9:0] wrong_timer_minus = 'd0;
     reg [2:0] state = 'd0;
-    reg idle = 'd0;
+//    reg idle = 'd0;
     button_push B2 (clk_in, ignore, ignore_sta);
     
-    always @(enb_cnt, state) begin 
-        if (enb_lock == 1'b1 && enb_cnt == 1'b1 && disable_cnt == 1'b0 && evop == 1'b0 && evcp == 1'b0 && state == WAIT) evop = 1'b1;
-        if (state == IDLE) begin
-            evop = 1'b0;
+    always @(posedge enb_cnt, posedge idle) begin 
+        if (idle) begin
+            evop <= 'd0;   
         end
-    end
-    
-    always @(disable_cnt,state) begin 
-        if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b1 && evop == 1'b0 && evcp == 1'b0 && state == WAIT) evcp = 1'b1;
-        else if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b0 && evop == 1'b0 && evcp == 1'b1 && state == NEW) exit = 1'b1;
+        else if (enb_lock == 1'b1 && enb_cnt == 1'b1 && disable_cnt == 1'b0 && evop == 1'b0 && evcp == 1'b0 && state == WAIT) evop <= 1'b1;
         
-        if (state == IDLE) begin
-            evcp = 'd0;
-            exit = 'd0;
-        end
     end
     
-    
-    and A1 (incorrect, gen_stop, !enb_lock); 
-    and A2 (correct, enb_lock, !gen_stop);
+    always @(posedge disable_cnt, posedge idle) begin 
+        if (idle) begin
+            evcp <= 'd0;            
+        end
+        else if (enb_lock == 1'b1 && enb_cnt == 1'b0 && disable_cnt == 1'b1 && evop == 1'b0 && evcp == 1'b0 && state == WAIT) evcp <= 1'b1;        
+    end
     
     always @(posedge clk_in) begin    
         if (idle == 1'b1) begin 
             state <= IDLE;
             pre_state <= state;
-            pulse_count <= 1'b1;
             reset <= 1'b1;    
         end
         else begin
@@ -121,22 +85,23 @@ module d_module_timer(
             //TODO: IDENTIFY CORRECT CASES
             if (enb_lock == 1'b1) begin 
                 //TODO: WAIT
-                if (!evop && !evcp && !exit) begin
+                if (!evop && !evcp ) begin
                     state <= WAIT;
                     pre_state <= state;
                 end
+                 //TODO: EXIT
+                else if (!evop && evcp && !disable_cnt) begin 
+                    state <= EXIT;
+                    pre_state <= state;
+                end 
                 //TODO: NEW PASS
-                else if (!evop && evcp && !exit) begin 
+                else if (!evop && evcp && disable_cnt) begin 
                     state <= NEW;
                     pre_state <= state;
                 end
-                //TODO: EXIT
-                else if (!evop && evcp && exit) begin 
-                    state <= EXIT;
-                    pre_state <= state;
-                end   
+                 
                 //TODO: CLOSE 
-                else if (evop && !evcp && !exit) begin 
+                else if (evop && !evcp && !disable_cnt) begin 
                     if (enb_cnt == 1'b0) begin 
                         state <= CLOSE;
                         pre_state <= state;
@@ -170,19 +135,22 @@ module d_module_timer(
         end    
     end
     
+   
     //TODO: There are 2 types of 1Hz clock, non-stop(without reset) and with reset.
     clk_divider #(.DIV(28'd1)) clock_1hz (clk_in, pulse_count, clk_1hz);
     clk_divider #(.DIV(28'd1)) clock_1hz_ns (evop & clk_in, 1'b0, clk_1hz_ns); 
     
     and A0 (clocked_1hz, clk_1hz_ns, !eval, !evig);
     
-    always @(posedge clocked_1hz) begin
-        if (co30 > 'd0 && (state == CLOSE || state == OPEN)) begin 
-            co30 <= (co30 == 'd0) ? co30 : co30 - 1;       
-        end
-        else if (state == IDLE) begin
+    always @(posedge clocked_1hz, posedge idle) begin
+         if (idle == 1'd1) begin
             co30 <= 'd30;
         end 
+        else begin
+            if (co30 > 'd0 && evop == 'd1) begin 
+                co30 <= (co30 == 'd0) ? co30 : co30 - 1;       
+            end
+        end
     end   
     
     always @(posedge (clk_in)) begin
@@ -190,9 +158,15 @@ module d_module_timer(
             eval <= 1'b0;
             evig <= 1'b1;
         end
+        
         else if (co30 == 'd0 && state == OPEN && !eval && !evig) begin 
             eval <= 1'b1;
         end
+        
+        else if (co30 == 'd0 && state == OPEN && !eval && evig && pre_state == CLOSE) begin
+            evig <= 1'b0;   
+        end
+        
         else if (state == IDLE) begin
             eval <= 1'b0;
             evig <= 1'b0;
@@ -226,16 +200,16 @@ module d_module_timer(
                 end
             end
             OPEN: begin 
-                cl10 <= 5'd10;
+                cl10 <= 5'd10;      // reset close counter
                 enb_set <= 0;
-                enb_inp <= 1;
-                led_rgb <= YELLOW;
+                enb_inp <= 1;       
+                led_rgb <= BLUE;
                 rgb_toggle <= 1'b0;
                 led_cnt <= co30;
-                //TODO:
-                if (pre_state == CLOSE && co30 == 'd0) begin 
-                    rgb_toggle <= 1'b0;
-                end   
+//                TODO:
+                if (co30 == 'd0 && eval == 1'b1) begin 
+                    rgb_toggle <= 1'b1;
+                end   //don't understand
                 
             end 
             CLOSE: begin 
@@ -246,7 +220,7 @@ module d_module_timer(
                 //TODO:
                 led_cnt <= cl10;
                 cl10 <= cl10 - 1'b1;
-                if (cl10 == 'd0) begin      
+                if (cl10 == 'd0) begin    //có th? thay = led_cnt ð? th? ð? chính xác  
                     idle <= 1'b1;
                 end
             end
@@ -257,6 +231,8 @@ module d_module_timer(
                 rgb_toggle <= 1'b0;
             end
             EXIT: begin 
+                enb_set <= 0;
+                enb_inp <= 0;
                 led_rgb <= OFF;
                 idle <= 1'b1;
             end
@@ -284,5 +260,4 @@ module d_module_timer(
             end
         endcase
     end
-    //Handle after open    
 endmodule
