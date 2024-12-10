@@ -21,7 +21,7 @@
 
 
 module h_gandata(
-output [127:0]  lcd_h0,
+output [127:0] lcd_h0,
        [127:0] lcd_h1
     );
 assign lcd_h0 = "Cua mo roi...   ";

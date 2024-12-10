@@ -27,14 +27,14 @@ output rs,e,[7:0] data
 wire [127:0] lcd_h0;
 wire [127:0] lcd_h1;
 //wire clk;
-//clk_divider #(.DIV(28'd1000)) clk_1ms(clk_in,'d0, clk);        //ng?t 1ms
+clk_divider #(.DIV(28'd1000)) clk_1ms(clk_in,'d0, clk);        //ng?t 1ms
 h_gandata IC1 (
         .lcd_h0(lcd_h0),
         .lcd_h1(lcd_h1)
         );
         
 h_khoitao_ht IC2(
-        .clk(clk_in),
+        .clk(clk),
         .lcd_h0(lcd_h0),
         .lcd_h1(lcd_h1),
         .rs(rs),

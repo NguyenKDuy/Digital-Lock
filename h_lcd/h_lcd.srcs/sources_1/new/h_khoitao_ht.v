@@ -38,20 +38,20 @@ output rs,e,[7:0] data
      wire[7:0] lcd_h1b[0:15];
      
      reg [3:0] state= LCD_INIT;
-     reg [15:0] slx='d0;
-     reg [3:0] ptr='d0;
+     reg [15:0] slx=15'd0;
+     reg [3:0] ptr=4'd0;
      
      reg rsr;
      reg er;
      reg [7:0] datar;
      
-     wire [7:0] cmd [0:5];
+     wire [7:0] cmd [0:6];
      
      assign e = er;
      assign rs = rsr;
      assign data= datar;
-     
-     assign cmd[0]=8'h3c; //initialize
+       
+     assign cmd[0]=8'h30; //initialize
      assign cmd[1]=8'h38; //function set
      assign cmd[2]=8'h0C; //display off
      assign cmd[3]=8'h01; //display clear
@@ -108,22 +108,22 @@ output rs,e,[7:0] data
         15'd190: er <= 1'b1;
         15'd195: er <= 1'b0;
 
-        15'd210: begin
+        15'd510: begin
             rsr <= 1'b0;
             datar <= cmd[4]; // Entry Mode Set
         end
-        15'd215: er <= 1'b1;
-        15'd235: er <= 1'b0;
+        15'd515: er <= 1'b1;
+        15'd535: er <= 1'b0;
 
-//        15'd250: begin
+//        15'd550: begin
 //            rsr <= 1'b0;
 //            datar <= cmd[5]; // Cursor Blink
 //        end
-//        15'd255: er <= 1'b1;
-//        15'd275: er <= 1'b0;
+//        15'd555: er <= 1'b1;
+//        15'd575: er <= 1'b0;
       
       
-        15'd300: begin
+        15'd600: begin
             slx <= 15'd0;
             state <= LCD_ADDR_L0; // Transition to idle or next state
           end
