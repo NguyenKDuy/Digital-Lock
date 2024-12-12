@@ -15,7 +15,6 @@ module d_main(
     output [2:0] rgb_out,     
     output eval
     ,output evcp  
-    ,output evop  
     ,output [2:0] state    
     );
     wire [2:0] led_rgb;
@@ -36,7 +35,7 @@ module d_main(
     ,.idle(idle)
     ,.eval(eval)
     ,.evcp(evcp)
-    ,.evop(evop)
+    ,.state(state)
     );    
     
     d_module_led_rgb D2 (

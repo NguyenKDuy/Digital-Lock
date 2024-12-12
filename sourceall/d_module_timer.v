@@ -17,7 +17,7 @@ module d_module_timer(
     output reg idle = 'd0,
     output reg eval = 1'b0
     ,output reg evcp = 1'b0
-    ,output reg evop = 1'b0
+    ,output reg [2:0] state = 'd0
     );
     //States
     localparam IDLE = 3'b000;
@@ -37,9 +37,8 @@ module d_module_timer(
     localparam WHITE = 3'b111;
     localparam BLUE = 3'b001;
     
-    reg [2:0] state;
-    reg evcp = 1'b0; 
-    reg evop = 1'b0;
+//    reg [2:0] state;
+    reg evop = 1'd0;
     reg exit = 1'b0;
     reg evig = 1'b0;
     //Timer

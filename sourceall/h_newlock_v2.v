@@ -30,9 +30,6 @@ module h_newlock_v2(
          		clk_in,
         output 	reg disable_cnt = 'd0,
                 reg [15:0] password = 16'd0,
-                reg dis_1 =1'd0,
-                reg dis_2 =1'd0,
-                reg dis_3 =1'd0,
                 reg success = 1'b0
     );
 
@@ -43,6 +40,9 @@ module h_newlock_v2(
            button_press B2(clk_in, exit_button,button_push_3s_exit);
 //    clk_divider #(.DIV(28'd1000)) clock_1hz (clk_in, pulse_count, count);
     reg [30:0] counter = 0;
+    reg dis_1 =1'd0;
+    reg dis_2 =1'd0;
+    reg dis_3 =1'd0;
     always @(posedge clk_in) begin 
         if (disable_cnt == 1 && enough == 1 && button_push_3s_exit && success == 0) begin
             success <= 1'b1;

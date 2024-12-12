@@ -10,7 +10,8 @@ module mergeALL(
     output [2:0] rgb,
     output lock_status,
     output eval,
-    output success
+    output success,
+    output [2:0] state
     );
     wire [2:0] error_counter;
     wire [15:0] led_cnt16;
@@ -63,7 +64,7 @@ module mergeALL(
                 ,.rgb_out(rgb)
                 ,.eval(eval)
                 ,.evcp(evcp)
-                ,.evop(evop)
+                ,.state(state)
                 );    
                 
     l_10_to_16bit L1(.led_cnt(led_cnt)
@@ -79,15 +80,12 @@ module mergeALL(
                     ,.clk_in(clk)
                     ,.disable_cnt(disable_cnt)
                     ,.password(password)
-                    ,.dis_1(dis_1)
-                    ,.dis_2(dis_2)
-                    ,.dis_3(dis_3)
                     ,.success(success)
                     );
                 
     h_un_lock H1(.clk_in(clk)
                     ,.enb_lock(enb_lock)
-                    ,.disable_cnt(disable_cnt)
+                    ,.disable_cnt(evcp)
                     ,.button(btn1)
                     ,.enb_cnt(lock_status)
                     );

@@ -55,7 +55,7 @@ always @(state) begin
     end
     else if (state == EXIT && success == 0) begin
         lcd_h0="Fail to save new";
-        lcd_h1="pass, EXIT   ";
+        lcd_h1="pass, EXIT      ";
     end
     else if (state == OPEN && eval == 0) begin
         lcd_h0="Door opening    ";
